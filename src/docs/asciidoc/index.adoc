@@ -1,4 +1,4 @@
-= Printer API
+= CDQ Task API
 :stylesheet: src/docs/asciidoc/style.css
 
 include::src/docs/asciidoc/sidebar.adoc[]
