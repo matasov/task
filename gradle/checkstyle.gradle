@@ -1,0 +1,13 @@
+checkstyle {
+  showViolations = false
+  toolVersion = '8.36.2'
+  checkstyleTest.enabled = false
+}
+
+tasks.withType(Checkstyle) {
+  group = 'Checkstyle'
+  reports {
+    xml.enabled = false
+    html.enabled = true
+  }
+}

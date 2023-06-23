@@ -1,0 +1,162 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath("org.asciidoctor:asciidoctor-gradle-jvm:3.3.2")
+    }
+}
+
+plugins {
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
+	id 'java'
+	id 'org.springframework.boot' version '3.0.5'
+	id 'io.spring.dependency-management' version '1.1.0'
+	id 'checkstyle'
+	id 'jacoco'
+}
+
+apply from: "${projectDir}/gradle/checkstyle.gradle"
+apply plugin: 'org.asciidoctor.jvm.convert'
+
+group = 'com.cdq'
+version = '1'
+
+java {
+	sourceCompatibility = '17'
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'javax.validation:validation-api:2.0.1.Final'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springdoc:springdoc-openapi-ui:1.1.37'
+	
+	implementation 'org.flywaydb:flyway-core:9.8.1'
+
+    runtimeOnly 'org.postgresql:postgresql'	
+
+	compileOnly 'org.projectlombok:lombok:1.18.24'
+	annotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.ehcache:ehcache:3.10.8'
+    implementation 'org.hibernate.orm:hibernate-jcache'
+    implementation 'javax.cache:cache-api'
+
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    testImplementation 'org.testcontainers:junit-jupiter:1.17.6'
+	testImplementation 'org.testcontainers:postgresql:1.17.6'
+
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.8.0-M1'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.0-M1'
+    implementation 'org.springdoc:springdoc-openapi-ui:1.1.37'
+}
+
+def snippetsDir = file('target/snippets')
+
+asciidoctor {
+    dependsOn test
+    sourceDir  file('src/docs/asciidoc')
+    outputDir  file('build/docs')
+
+    logDocuments = true
+    attributes = [
+            'source-highlighter': 'highlightjs',
+            'imagesdir'         : './images',
+            'toc'               : 'left',
+            'toclevels'         : 3,
+            'numbered'          : '',
+            'icons'             : 'font',
+            'setanchors'        : '',
+            'idprefix'          : '',
+            'idseparator'       : '-',
+            'docinfo1'          : '',
+            'safe-mode-unsafe'  : '',
+            'allow-uri-read'    : true,
+            'snippets'          : snippetsDir,
+            linkattrs           : true,
+            encoding            : 'utf-8'
+    ]
+}
+
+bootJar {
+    dependsOn asciidoctor
+    from("build/docs/html5") {
+        into 'static/docs'
+    }
+}
+
+build {
+    dependsOn bootJar
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+test {
+    finalizedBy jacocoTestReport
+}
+
+check.dependsOn(jacocoTestCoverageVerification)
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+	afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: ['com/cdq/task/dtos/**', 'com/cdq/task/models/**', 'com/cdq/task/exceptions/**'])
+        }))
+    }
+}
+
+jacocoTestCoverageVerification {
+    dependsOn jacocoTestReport
+    violationRules {
+        rule {
+            limit {
+                counter = 'INSTRUCTION'
+                value = 'COVEREDRATIO'
+                minimum = 0.77
+            }
+        }
+
+        rule {
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.50
+            }
+        }
+
+        rule {
+            limit {
+                counter = 'CLASS'
+                value = 'MISSEDCOUNT'
+                maximum = 9
+            }
+        }
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: ['com/cdq/task/dtos/**', 'com/cdq/task/models/**', 'com/cdq/task/exceptions/**'])
+        }))
+    }
+}
+
+task buildDocker(type: Exec) {
+    dependsOn assemble
+    commandLine 'docker', 'build', '-t', 'task:1', '.'
+}

@@ -1,0 +1,8 @@
+= Printer API
+:stylesheet: src/docs/asciidoc/style.css
+
+include::src/docs/asciidoc/sidebar.adoc[]
+
+--
+include::src/docs/asciidoc/body.adoc[]
+--

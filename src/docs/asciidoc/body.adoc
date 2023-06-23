@@ -1,0 +1,63 @@
+[discrete]
+= Create task [[create_task]]
+
+.curl
+include::{snippets}/tasks/create-task/curl-request.adoc[]
+
+.request
+include::{snippets}/tasks/create-task/http-request.adoc[]
+
+.request fields
+include::{snippets}/tasks/create-task/request-fields.adoc[]
+
+.response
+include::{snippets}/tasks/create-task/http-response.adoc[]
+
+.response fields
+include::{snippets}/tasks/create-task/response-fields.adoc[]
+
+
+[discrete]
+= Get tasks [[get_tasks]]
+
+.curl
+include::{snippets}/tasks/get-all-tasks/curl-request.adoc[]
+
+.response
+include::{snippets}/tasks/get-all-tasks/http-response.adoc[]
+
+.response fields
+include::{snippets}/tasks/get-all-tasks/response-fields.adoc[]
+
+
+[discrete]
+= Get task [[get_task]]
+
+.curl
+include::{snippets}/tasks/get-task/curl-request.adoc[]
+
+.path parameter
+include::{snippets}/tasks/get-task/path-parameters.adoc[]
+
+.request
+include::{snippets}/tasks/get-task/http-request.adoc[]
+
+.response
+include::{snippets}/tasks/get-task/http-response.adoc[]
+
+.response fields
+include::{snippets}/tasks/get-task/response-fields.adoc[]
+
+
+[discrete]
+= Delete task [[delete_task]]
+
+.curl
+include::{snippets}/tasks/delete-task/curl-request.adoc[]
+
+.path parameter
+include::{snippets}/tasks/delete-task/path-parameters.adoc[]
+
+.response
+include::{snippets}/tasks/delete-task/http-response.adoc[]
+
